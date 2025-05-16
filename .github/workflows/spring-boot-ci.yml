@@ -17,19 +17,7 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
-      - name: Grant execute permission for gradlew
-        if: ${{ github.event_name == 'push' }}
-        run: chmod +x gradlew
       - name: Build with Maven
-        if: ${{ github.event_name == 'push' }}
         run: mvn clean install -DskipTests
-      - name: Build with Gradle
-        if: ${{ github.event_name == 'pull_request' }}
-        run: ./gradlew build -x test
       - name: Run Unit Tests with Maven
-        if: ${{ github.event_name == 'push' }}
         run: mvn test
-      - name: Run Unit Tests with Gradle
-        if: ${{ github.event_name == 'pull_request' }}
-        run: ./gradlew test
-
