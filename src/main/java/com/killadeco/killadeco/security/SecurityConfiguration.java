@@ -29,14 +29,10 @@ public class SecurityConfiguration {
                 .cors(cors -> cors.configure(http))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // PUBLIC ENDPOINTS --------------------------------------------------
+                        // ENDPOINTS PÚBLICOS --------------------------------------------------
                         .requestMatchers(publicEndpoints()).permitAll()
-                        // AUTH ENDPOINTS ---------------------------------------------------
-                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                        // ENDPOINTS CON PERMISOS ESPECÍFICOS ---------------------------------------------------
                         .requestMatchers(HttpMethod.POST, "/auth/register").hasAnyAuthority("SUPER_ADMIN", "ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/auth/generate-reset-token").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/reset-password").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/auth/oauth-success").permitAll()
                         // USER ENDPOINTS ---------------------------------------------------
                         .requestMatchers(HttpMethod.GET, "/user/{id}").hasAnyAuthority("ADMIN", "SUPER_ADMIN", "CLIENT")
                         .requestMatchers(HttpMethod.POST, "/user/images/upload").hasAnyAuthority("ADMIN", "SUPER_ADMIN", "CLIENT")
@@ -49,7 +45,7 @@ public class SecurityConfiguration {
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
-                        .loginPage("/auth/login") // Ruta de login si querés una custom
+                        .loginPage("/auth/login")
                         .defaultSuccessUrl("/auth/oauth-success", true)
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
@@ -84,7 +80,10 @@ public class SecurityConfiguration {
                 "/webjars/**",
                 "/swagger-ui-custom.html",
                 "/public/lead/create",
-                "/auth/oauth-success"
+                "/auth/oauth-success",
+                "/auth/login", // Este es el cambio clave
+                "/auth/generate-reset-token", // Y estos dos también
+                "/auth/reset-password",
         };
     }
 }
