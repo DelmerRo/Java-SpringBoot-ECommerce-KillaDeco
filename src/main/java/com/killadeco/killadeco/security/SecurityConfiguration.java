@@ -44,11 +44,11 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.DELETE, "/user/{id}").hasAuthority("SUPER_ADMIN")
                         .anyRequest().authenticated()
                 )
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login(oauth2 -> oauth2
-                        .loginPage("/auth/login")
+                        // Las rutas de login de Oauth2 están configuradas en publicEndpoints()
                         .defaultSuccessUrl("/auth/oauth-success", true)
                 )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) -> {
                             String jsonResponse = String.format(
@@ -81,9 +81,12 @@ public class SecurityConfiguration {
                 "/swagger-ui-custom.html",
                 "/public/lead/create",
                 "/auth/oauth-success",
-                "/auth/login", // Este es el cambio clave
-                "/auth/generate-reset-token", // Y estos dos también
+                "/auth/login",
+                "/auth/generate-reset-token",
                 "/auth/reset-password",
+                // Agregamos las rutas de OAuth2 para que no las bloquee
+                "/login/oauth2/**",
+                "/oauth2/**"
         };
     }
 }
