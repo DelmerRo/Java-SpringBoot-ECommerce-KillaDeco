@@ -46,7 +46,6 @@ public class SecurityConfiguration {
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login(oauth2 -> oauth2
-                        // Las rutas de login de Oauth2 están configuradas en publicEndpoints()
                         .defaultSuccessUrl("/auth/oauth-success", true)
                 )
                 .exceptionHandling(ex -> ex
@@ -74,7 +73,8 @@ public class SecurityConfiguration {
 
     private static String[] publicEndpoints() {
         return new String[]{
-                "/api-docs/**",
+                "/v3/api-docs/**",
+                "/swagger-ui.html", // Agregamos esta línea
                 "/swagger-ui/**",
                 "/api-docs.yaml",
                 "/webjars/**",
@@ -84,7 +84,6 @@ public class SecurityConfiguration {
                 "/auth/login",
                 "/auth/generate-reset-token",
                 "/auth/reset-password",
-                // Agregamos las rutas de OAuth2 para que no las bloquee
                 "/login/oauth2/**",
                 "/oauth2/**"
         };
