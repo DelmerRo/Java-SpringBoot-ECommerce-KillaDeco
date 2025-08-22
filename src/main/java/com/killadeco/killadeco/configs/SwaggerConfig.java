@@ -1,7 +1,5 @@
 package com.killadeco.killadeco.configs;
 
-
-
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
@@ -28,7 +26,8 @@ public class SwaggerConfig {
                         .contact(new io.swagger.v3.oas.models.info.Contact()
                                 .name("Killa Deco"))
                 )
-                .addServersItem(new Server().url("https://killa-deco.onrender.com").description("Servidor de Producción"))
+                // Aquí está el cambio
+                .addServersItem(new Server().url("https://java-springboot-ecommerce-killadeco.onrender.com").description("Servidor de Producción"))
                 .addServersItem(new Server().url("http://localhost:8080").description("Servidor de Desarrollo"))
                 .addSecurityItem(new SecurityRequirement().addList("TOKEN"))
                 .components(new Components()

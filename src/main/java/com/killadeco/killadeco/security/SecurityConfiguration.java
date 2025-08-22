@@ -29,10 +29,14 @@ public class SecurityConfiguration {
                 .cors(cors -> cors.configure(http))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // ENDPOINTS PÚBLICOS --------------------------------------------------
+                        // PUBLIC ENDPOINTS --------------------------------------------------
                         .requestMatchers(publicEndpoints()).permitAll()
-                        // ENDPOINTS CON PERMISOS ESPECÍFICOS ---------------------------------------------------
+                        // AUTH ENDPOINTS ---------------------------------------------------
+                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/register").hasAnyAuthority("SUPER_ADMIN", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/auth/generate-reset-token").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/reset-password").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/auth/oauth-success").permitAll()
                         // USER ENDPOINTS ---------------------------------------------------
                         .requestMatchers(HttpMethod.GET, "/user/{id}").hasAnyAuthority("ADMIN", "SUPER_ADMIN", "CLIENT")
                         .requestMatchers(HttpMethod.POST, "/user/images/upload").hasAnyAuthority("ADMIN", "SUPER_ADMIN", "CLIENT")
@@ -44,10 +48,11 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.DELETE, "/user/{id}").hasAuthority("SUPER_ADMIN")
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/auth/login") // Ruta de login si querés una custom
                         .defaultSuccessUrl("/auth/oauth-success", true)
                 )
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) -> {
                             String jsonResponse = String.format(
@@ -73,19 +78,13 @@ public class SecurityConfiguration {
 
     private static String[] publicEndpoints() {
         return new String[]{
-                "/v3/api-docs/**",
-                "/swagger-ui.html", // Agregamos esta línea
+                "/api-docs/**",
                 "/swagger-ui/**",
                 "/api-docs.yaml",
                 "/webjars/**",
                 "/swagger-ui-custom.html",
                 "/public/lead/create",
-                "/auth/oauth-success",
-                "/auth/login",
-                "/auth/generate-reset-token",
-                "/auth/reset-password",
-                "/login/oauth2/**",
-                "/oauth2/**"
+                "/auth/oauth-success"
         };
     }
 }
